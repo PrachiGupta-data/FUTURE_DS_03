@@ -579,3 +579,169 @@ fig.update_layout(
     yaxis_title="Number of Customers"
 )
 st.plotly_chart(fig, use_container_width=True)
+
+# ==========================================
+# Dynamic Business Insights
+# ==========================================
+
+st.header("💡 Business Insights")
+
+# Highest Converting Job
+job_conversion = (
+    filtered_df.groupby("job")["subscription"]
+    .apply(lambda x: (x == "yes").mean() * 100)
+)
+
+top_job = job_conversion.idxmax()
+top_job_rate = job_conversion.max()
+
+# Highest Converting Education
+education_conversion = (
+    filtered_df.groupby("education")["subscription"]
+    .apply(lambda x: (x == "yes").mean() * 100)
+)
+
+top_education = education_conversion.idxmax()
+top_education_rate = education_conversion.max()
+
+# Highest Converting Marital Status
+marital_conversion = (
+    filtered_df.groupby("marital")["subscription"]
+    .apply(lambda x: (x == "yes").mean() * 100)
+)
+
+top_marital = marital_conversion.idxmax()
+top_marital_rate = marital_conversion.max()
+
+# Best Performing Month
+month_conversion = (
+    filtered_df.groupby("month")["subscription"]
+    .apply(lambda x: (x == "yes").mean() * 100)
+)
+
+best_month = month_conversion.idxmax()
+best_month_rate = month_conversion.max()
+
+# Average Call Duration
+avg_duration = filtered_df["duration"].mean()
+
+# Average Balance
+avg_balance = filtered_df["balance"].mean()
+
+# Loan Analysis
+housing_yes = (
+    filtered_df[filtered_df["housing"] == "yes"]["subscription"]
+    .eq("yes")
+    .mean() * 100
+)
+
+housing_no = (
+    filtered_df[filtered_df["housing"] == "no"]["subscription"]
+    .eq("yes")
+    .mean() * 100
+)
+
+loan_yes = (
+    filtered_df[filtered_df["loan"] == "yes"]["subscription"]
+    .eq("yes")
+    .mean() * 100
+)
+
+loan_no = (
+    filtered_df[filtered_df["loan"] == "no"]["subscription"]
+    .eq("yes")
+    .mean() * 100
+)
+
+# Display Insights
+st.success(f"""
+### 📊 Key Insights
+
+👥 Total Customers Analysed: **{total_customers:,}**
+
+✅ Customers Subscribed: **{subscribed_customers:,}**
+
+📈 Overall Conversion Rate: **{subscription_rate:.2f}%**
+
+📉 Overall Drop-off Rate: **{drop_off_rate:.2f}%**
+
+💼 Highest Converting Job:
+**{top_job.title()} ({top_job_rate:.2f}%)**
+
+🎓 Highest Converting Education:
+**{top_education.title()} ({top_education_rate:.2f}%)**
+
+💍 Highest Converting Marital Status:
+**{top_marital.title()} ({top_marital_rate:.2f}%)**
+
+📅 Best Performing Campaign Month:
+**{best_month.upper()} ({best_month_rate:.2f}%)**
+
+⏱ Average Call Duration:
+**{avg_duration:.0f} seconds**
+
+💰 Average Account Balance:
+**{avg_balance:,.0f}**
+""")
+
+# ==========================================
+# Dynamic Recommendations
+# ==========================================
+
+st.header("🚀 Business Recommendations")
+
+recommendations = []
+
+# Conversion Recommendation
+if subscription_rate < 15:
+    recommendations.append(
+        "Improve customer targeting and campaign messaging to increase the overall conversion rate."
+    )
+else:
+    recommendations.append(
+        "The selected customer segment shows a healthy conversion rate. Continue targeting similar customers."
+    )
+
+# Call Duration
+if avg_duration < 250:
+    recommendations.append(
+        "Increase customer engagement during calls, as longer conversations often lead to better conversion."
+    )
+else:
+    recommendations.append(
+        "Maintain the current call engagement strategy, as customers are spending sufficient time on calls."
+    )
+
+# Housing Loan
+if housing_no > housing_yes:
+    recommendations.append(
+        "Customers without housing loans are converting better. Consider prioritizing this segment."
+    )
+else:
+    recommendations.append(
+        "Customers with housing loans also show promising conversion. Design personalized offers for them."
+    )
+
+# Personal Loan
+if loan_no > loan_yes:
+    recommendations.append(
+        "Focus campaigns on customers without personal loans, as they currently have higher subscription rates."
+    )
+
+# Best Month
+recommendations.append(
+    f"Plan future campaigns around **{best_month.upper()}**, which currently shows the highest conversion rate."
+)
+
+# Top Job
+recommendations.append(
+    f"Increase marketing efforts for **{top_job.title()}** customers, who currently have the highest subscription rate."
+)
+
+# Top Education
+recommendations.append(
+    f"Create personalized campaigns targeting customers with **{top_education.title()}** education backgrounds."
+)
+
+for i, rec in enumerate(recommendations, start=1):
+    st.write(f"**{i}.** {rec}")
